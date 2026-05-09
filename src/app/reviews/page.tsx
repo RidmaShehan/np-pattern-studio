@@ -11,6 +11,8 @@ import { notFound } from 'next/navigation';
 import { bodyMuted, cardSurface, mainShell } from '@/lib/publicStyles';
 import { cn } from '@/lib/utils';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ReviewsPage() {
   const [content, settings] = await Promise.all([getPublicContent(), getPublicSettings()]);
   if (settings.controls.maintenance_mode) return <MaintenanceMode />;

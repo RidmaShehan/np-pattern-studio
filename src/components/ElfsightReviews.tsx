@@ -1,18 +1,11 @@
 'use client';
 
 import Script from 'next/script';
-
-function normalizeElfsightAppId(raw: unknown): string {
-  if (raw == null) return '';
-  const base = typeof raw === 'string' ? raw : String(raw);
-  let s = base.trim();
-  s = s.replace(/^elfsight-app-/i, '').replace(/\s+/g, '');
-  return s;
-}
+import { extractElfsightAppId } from '@/lib/elfsight';
 
 /** Loads Elfsight only when a valid app UUID is provided (otherwise returns null). */
 export default function ElfsightReviews({ appId }: { appId?: string | null }) {
-  const id = normalizeElfsightAppId(appId);
+  const id = extractElfsightAppId(appId);
   if (!id) return null;
 
   return (
