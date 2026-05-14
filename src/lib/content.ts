@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import { PublicSiteSeo, ServiceItem, SiteControls, SITE_SEO_DEFAULTS } from '@/types';
 
 type WidgetRecord = {
@@ -222,6 +222,8 @@ function getArray<T>(value: unknown, fallback: T[]) {
 }
 
 export async function getPublicContent() {
+  if (!isSupabaseConfigured()) return defaultContent;
+
   const supabase = await createClient();
   const { data } = await supabase.from('widgets').select('type, content').eq('visible', true).order('order');
   const widgets = (data ?? []) as WidgetRecord[];
@@ -280,6 +282,11 @@ export async function getPublicContent() {
 }
 
 export const getPublicSettings = cache(async (): Promise<PublicSettings> => {
+  if (!isSupabaseConfigured()) {
+    const fromEnv = (process.env.NEXT_PUBLIC_ELFSIGHT_GOOGLE_REVIEWS_APP_ID ?? '').trim();
+    return fromEnv ? { ...defaultSettings, elfsight_google_reviews_app_id: fromEnv } : defaultSettings;
+  }
+
   const supabase = await createClient();
   const { data } = await supabase.from('site_settings').select('whatsapp_number, contact_info, social_links').eq('id', 1).single();
 
