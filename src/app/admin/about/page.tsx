@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Widget } from '@/types';
 import { toast } from 'sonner';
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import ImageUploadField from '@/components/admin/ImageUploadField';
 
 const DEFAULT = {
   sectionEyebrow: 'About us',
@@ -30,7 +31,7 @@ function trimUrl(raw: unknown) {
 }
 
 export default function AdminAboutPage() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [widget, setWidget] = useState<Widget | null>(null);
   const [loading, setLoading] = useState(true);
@@ -135,8 +136,6 @@ export default function AdminAboutPage() {
     }
   };
 
-  const previewSrc = imageUrl.trim();
-
   if (loading) {
     return <div className="rounded-xl border border-slate-200 bg-white p-6 text-slate-500">Loading about section…</div>;
   }
@@ -189,20 +188,13 @@ export default function AdminAboutPage() {
             <Label>Heritage text</Label>
             <Textarea value={heritageText} onChange={e => setHeritageText(e.target.value)} rows={6} />
           </div>
-          <div>
-            <Label>Side image URL (optional)</Label>
-            <Input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="https://…" />
-            <p className="mt-1.5 text-xs text-zinc-500">Direct image link (JPEG, PNG, WebP). Shown beside the heritage text.</p>
-          </div>
-          {previewSrc ? (
-            <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-              <p className="border-b border-slate-100 bg-white px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
-                Preview
-              </p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={previewSrc} alt="" className="max-h-56 w-full object-contain" />
-            </div>
-          ) : null}
+          <ImageUploadField
+            label="Side image (optional)"
+            value={imageUrl}
+            onChange={setImageUrl}
+            hint="Shown beside the heritage text. Image is stored directly in the database."
+            previewAspect="max-h-56 w-full"
+          />
         </CardContent>
       </Card>
 

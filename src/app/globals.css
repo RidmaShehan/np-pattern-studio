@@ -6,6 +6,11 @@
   --foreground: #0d1b2a;
   --muted: #555555;
   --gold: #d4af37;
+  /* Fashion-editorial base texture (linen / cloth weave + grain) */
+  --texture-thread: rgba(13, 27, 42, 0.052);
+  --texture-thread-fine: rgba(13, 27, 42, 0.034);
+  --texture-weave-opacity: 0.072;
+  --texture-grain-opacity: 0.038;
 }
 
 @theme inline {
@@ -26,10 +31,81 @@ html {
 }
 
 body {
-  background: var(--background);
+  position: relative;
+  isolation: isolate;
+  min-height: 100%;
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans);
   line-height: 1.55;
+  /* Soft vignette + warm lift — reads as “paper” without a flat fill */
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% -18%, rgba(212, 175, 55, 0.075), transparent 52%),
+    radial-gradient(ellipse 55% 45% at 100% 0%, rgba(13, 27, 42, 0.04), transparent 48%),
+    radial-gradient(ellipse 50% 35% at 0% 25%, rgba(13, 27, 42, 0.028), transparent 50%);
+}
+
+/*
+ * Fashion “base cloth” weave — warp / weft + diagonal bias (fixed behind main z-10).
+ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      122deg,
+      transparent 0,
+      transparent 11px,
+      var(--texture-thread-fine) 11px,
+      var(--texture-thread-fine) 12px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 6px,
+      var(--texture-thread) 6px,
+      var(--texture-thread) 7px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 6px,
+      var(--texture-thread) 6px,
+      var(--texture-thread) 7px
+    );
+  background-repeat: repeat;
+  opacity: var(--texture-weave-opacity);
+}
+
+/* Fine fiber grain — sits above weave */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E");
+  background-size: 192px 192px;
+  opacity: var(--texture-grain-opacity);
+}
+
+@media (max-width: 767px) {
+  body::before {
+    opacity: calc(var(--texture-weave-opacity) * 0.55);
+  }
+
+  body::after {
+    opacity: calc(var(--texture-grain-opacity) * 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    opacity: 0;
+  }
 }
 
 ::selection {

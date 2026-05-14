@@ -60,7 +60,7 @@ export default function WhatsAppButton({ phoneNumber }: WhatsAppButtonProps) {
       onMouseLeave={() => handleHover(false)}
       onFocus={() => handleHover(true)}
       onBlur={() => handleHover(false)}
-      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#128C43] text-white shadow-[0_18px_50px_-20px_rgba(18,140,67,0.75)] ring-4 ring-[#128C43]/25 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#D4AF37]/45"
+      className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] right-[calc(1.5rem+env(safe-area-inset-right,0px))] z-50 flex h-14 w-14 touch-manipulation items-center justify-center rounded-full bg-[#128C43] text-white shadow-[0_18px_50px_-20px_rgba(18,140,67,0.75)] ring-4 ring-[#128C43]/25 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#D4AF37]/45"
       aria-label="Chat on WhatsApp"
     >
       <MessageCircle className="h-7 w-7" />

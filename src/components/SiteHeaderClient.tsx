@@ -105,8 +105,7 @@ export default function SiteHeaderClient({ brandTitle, navItems, showContactCta 
       <header
         ref={barRef}
         className={cn(
-          'sticky top-0 z-40 border-b border-[#0D1B2A]/[0.06] bg-[#FAFBFC]/85 backdrop-blur-xl',
-          'supports-[backdrop-filter]:bg-[#FAFBFC]/72',
+          'sticky top-0 z-40 border-b border-[#0D1B2A]/[0.06] bg-[#FAFBFC]/92 backdrop-blur-md supports-[backdrop-filter]:bg-[#FAFBFC]/78 md:bg-[#FAFBFC]/85 md:backdrop-blur-xl md:supports-[backdrop-filter]:bg-[#FAFBFC]/72',
         )}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 md:h-[4.25rem] md:px-6">
@@ -178,7 +177,7 @@ export default function SiteHeaderClient({ brandTitle, navItems, showContactCta 
         <button
           type="button"
           aria-label="Close menu overlay"
-          className="fixed inset-0 z-30 bg-[#0D1B2A]/20 backdrop-blur-[2px] md:hidden"
+          className="fixed inset-0 z-30 bg-[#0D1B2A]/25 md:hidden"
           onClick={() => setOpen(false)}
         />
       ) : null}

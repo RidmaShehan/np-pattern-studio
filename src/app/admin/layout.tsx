@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   FileText,
+  Image as ImageIcon,
 } from 'lucide-react';
 import gsap from 'gsap';
 import { prefersReducedMotion } from '@/components/animations/prefersReducedMotion';
@@ -168,6 +169,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <nav className="flex-1 space-y-1 px-3 py-6">
             <NavLink href="/admin" icon={LayoutDashboard} label="Dashboard" />
             <NavLink href="/admin/widgets" icon={LayoutGrid} label="Widgets" />
+            <NavLink href="/admin/hero" icon={ImageIcon} label="Hero" />
             <NavLink href="/admin/about" icon={FileText} label="About" />
             <NavLink href="/admin/services" icon={Briefcase} label="Services" />
             <NavLink href="/admin/projects" icon={LayoutGrid} label="Projects" />
@@ -211,6 +213,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               {[
                 ['/admin', 'Home'],
                 ['/admin/widgets', 'Widgets'],
+                ['/admin/hero', 'Hero'],
                 ['/admin/about', 'About'],
                 ['/admin/services', 'Services'],
                 ['/admin/projects', 'Projects'],

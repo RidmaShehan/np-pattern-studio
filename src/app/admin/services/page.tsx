@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus } from 'lucide-react';
+import ImageUploadField from '@/components/admin/ImageUploadField';
 
 const DEFAULT_SERVICE_ITEMS: ServiceItem[] = [
   { id: 'default-1', title: 'Pattern Development', text: 'Technical pattern drafting with production-ready precision for high-end apparel.', active: true },
@@ -31,7 +32,7 @@ function normalizeImageUrl(url: unknown): string {
 }
 
 export default function AdminServicesPage() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [widget, setWidget] = useState<Widget | null>(null);
   const [title, setTitle] = useState('Technical precision for every stitch');
@@ -190,7 +191,6 @@ export default function AdminServicesPage() {
   };
 
   const activeCount = useMemo(() => items.filter(item => item.active !== false).length, [items]);
-  const editorPreviewSrc = normalizeImageUrl(editor.image_url);
 
   if (loading) {
     return <div className="rounded-xl border border-slate-200 bg-white p-6 text-slate-500">Loading services...</div>;
@@ -238,13 +238,13 @@ export default function AdminServicesPage() {
               <div key={item.id} className="rounded-lg border border-slate-200 p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex min-w-0 flex-1 gap-4">
-                    <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                    <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                       {img ? (
                         // eslint-disable-next-line @next/next/no-img-element -- admin preview of CMS URL
                         <img src={img} alt="" className="h-full w-full object-cover" />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-slate-100 text-[10px] text-slate-400 text-center px-1">
-                          Sparkles icon
+                          No image
                         </div>
                       )}
                     </div>
@@ -310,28 +310,13 @@ export default function AdminServicesPage() {
                 <Label>Description</Label>
                 <Textarea value={editor.text} onChange={e => setEditor({ ...editor, text: e.target.value })} rows={5} />
               </div>
-              <div>
-                <Label>Icon image URL (optional)</Label>
-                <Input
-                  value={editor.image_url ?? ''}
-                  placeholder="https://…"
-                  onChange={e => setEditor({ ...editor, image_url: e.target.value })}
-                />
-                <p className="mt-1.5 text-xs text-zinc-500">
-                  Shown instead of the default sparkles icon on service cards. Use a direct JPEG, PNG, or WebP link (square images look best).
-                </p>
-              </div>
-              {editorPreviewSrc ? (
-                <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-                  <p className="border-b border-slate-200 bg-white px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
-                    Preview
-                  </p>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- admin preview */}
-                  <div className="flex justify-center p-4">
-                    <img src={editorPreviewSrc} alt="" className="h-20 w-20 rounded-2xl object-cover ring-2 ring-[#D4AF37]/20" />
-                  </div>
-                </div>
-              ) : null}
+              <ImageUploadField
+                label="Icon image (optional)"
+                value={editor.image_url ?? ''}
+                onChange={(v) => setEditor({ ...editor, image_url: v })}
+            hint="Shown as a full-width cover image at the top of the service card."
+            previewAspect="h-48 w-full"
+              />
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"

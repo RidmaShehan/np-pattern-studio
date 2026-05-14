@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus } from 'lucide-react';
+import ImageUploadField from '@/components/admin/ImageUploadField';
 
 const DEFAULT_PROJECT_ITEMS: ProjectItem[] = [
   { id: 'project-1', name: 'The Signature Tailored Blazer', desc: 'Architecture-inspired blazer with precision-engineered balance lines.', active: true },
@@ -37,7 +38,7 @@ const emptyEditor = (): ProjectItem => ({
 });
 
 export default function AdminProjectsPage() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [widget, setWidget] = useState<Widget | null>(null);
   const [title, setTitle] = useState('Our Projects');
@@ -199,7 +200,6 @@ export default function AdminProjectsPage() {
   };
 
   const activeCount = useMemo(() => items.filter(item => item.active !== false).length, [items]);
-  const editorPreviewSrc = normalizeImageUrl(editor.image_url);
 
   if (loading) {
     return <div className="rounded-xl border border-slate-200 bg-white p-6 text-slate-500">Loading projects...</div>;
@@ -304,26 +304,13 @@ export default function AdminProjectsPage() {
                 <Label>Description</Label>
                 <Textarea value={editor.desc} onChange={e => setEditor({ ...editor, desc: e.target.value })} rows={5} />
               </div>
-              <div>
-                <Label>Cover image URL (optional)</Label>
-                <Input
-                  value={editor.image_url ?? ''}
-                  placeholder="https://…"
-                  onChange={e => setEditor({ ...editor, image_url: e.target.value })}
-                />
-                <p className="mt-1.5 text-xs text-zinc-500">
-                  Paste a direct image link (JPEG, PNG, WebP). You can upload to Supabase Storage, Cloudinary, or any public URL.
-                </p>
-              </div>
-              {editorPreviewSrc ? (
-                <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-                  <p className="border-b border-slate-200 bg-white px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
-                    Preview
-                  </p>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={editorPreviewSrc} alt="" className="max-h-48 w-full object-contain" />
-                </div>
-              ) : null}
+              <ImageUploadField
+                label="Cover image (optional)"
+                value={editor.image_url ?? ''}
+                onChange={(v) => setEditor({ ...editor, image_url: v })}
+                hint="Image is compressed and stored directly in the database."
+                previewAspect="max-h-48 w-full"
+              />
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={editor.active !== false} onChange={e => setEditor({ ...editor, active: e.target.checked })} />
                 Active on website

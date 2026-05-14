@@ -1,5 +1,6 @@
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
-import { ServiceItem, SiteControls } from '@/types';
+import { PublicSiteSeo, ServiceItem, SiteControls, SITE_SEO_DEFAULTS } from '@/types';
 
 type WidgetRecord = {
   type: string;
@@ -18,6 +19,8 @@ export type SiteContent = {
     primaryCta: string;
     secondaryCta: string;
     assistantNote: string;
+    /** Optional hero image (base64 data URL or public URL). Shown in the right panel of the hero card. */
+    image_url: string;
   };
   about: {
     title: string;
@@ -59,6 +62,8 @@ export type PublicFooterSettings = {
   nav_links: Array<{ href: string; label: string }>;
 };
 
+export type { PublicSiteSeo } from '@/types';
+
 export type PublicSettings = {
   whatsapp_number: string;
   contact_info: {
@@ -73,6 +78,7 @@ export type PublicSettings = {
   controls: Required<SiteControls>;
   /** Elfsight Google Reviews app UUID; empty = do not load third-party embed (avoids console errors). */
   elfsight_google_reviews_app_id: string;
+  seo: PublicSiteSeo;
 };
 
 const defaultContent: SiteContent = {
@@ -84,6 +90,7 @@ const defaultContent: SiteContent = {
     primaryCta: 'Get a free quote',
     secondaryCta: 'View our work',
     assistantNote: 'CAD workflow optimized',
+    image_url: '',
   },
   about: {
     title: 'Masters of the craft, built over decades',
@@ -176,6 +183,7 @@ const defaultSettings: PublicSettings = {
   social_links: [],
   footer: defaultFooter,
   elfsight_google_reviews_app_id: '',
+  seo: SITE_SEO_DEFAULTS,
   controls: {
     maintenance_mode: false,
     pages: {
@@ -234,6 +242,7 @@ export async function getPublicContent() {
       primaryCta: getString(hero.primaryCta, defaultContent.hero.primaryCta),
       secondaryCta: getString(hero.secondaryCta, defaultContent.hero.secondaryCta),
       assistantNote: getString(hero.assistantNote, defaultContent.hero.assistantNote),
+      image_url: getOptionalString(hero.image_url),
     },
     about: {
       title: getString(about.title, defaultContent.about.title),
@@ -270,7 +279,7 @@ export async function getPublicContent() {
   } satisfies SiteContent;
 }
 
-export async function getPublicSettings() {
+export const getPublicSettings = cache(async (): Promise<PublicSettings> => {
   const supabase = await createClient();
   const { data } = await supabase.from('site_settings').select('whatsapp_number, contact_info, social_links').eq('id', 1).single();
 
@@ -281,6 +290,7 @@ export async function getPublicSettings() {
 
   const rawFooter = data.contact_info?.footer as Record<string, unknown> | undefined;
   const rawControls = data.contact_info?.controls as SiteControls | undefined;
+  const rawSeo = data.contact_info?.seo as Record<string, unknown> | undefined;
   const navFromDb = getArray<{ href: string; label: string }>(rawFooter?.nav_links, []);
   const rawElfsight = data.contact_info?.elfsight_google_reviews_app_id as unknown;
   const elfsightFromDb =
@@ -291,6 +301,13 @@ export async function getPublicSettings() {
         : String(rawElfsight).trim();
   const elfsightFromEnv = (process.env.NEXT_PUBLIC_ELFSIGHT_GOOGLE_REVIEWS_APP_ID ?? '').trim();
   const elfsight_google_reviews_app_id = elfsightFromDb || elfsightFromEnv;
+
+  const site_title = getString(rawSeo?.site_title, SITE_SEO_DEFAULTS.site_title);
+  const meta_description = getString(rawSeo?.meta_description, SITE_SEO_DEFAULTS.meta_description);
+  const og_title = getString(rawSeo?.og_title, site_title);
+  const og_description = getString(rawSeo?.og_description, meta_description);
+  const og_image_url = getOptionalString(rawSeo?.og_image_url) || SITE_SEO_DEFAULTS.og_image_url;
+  const favicon_url = getOptionalString(rawSeo?.favicon_url) || SITE_SEO_DEFAULTS.favicon_url;
 
   return {
     whatsapp_number: getString(data.whatsapp_number, defaultSettings.whatsapp_number),
@@ -311,6 +328,14 @@ export async function getPublicSettings() {
       nav_links: navFromDb.length > 0 ? navFromDb : defaultFooter.nav_links,
     },
     elfsight_google_reviews_app_id,
+    seo: {
+      site_title,
+      meta_description,
+      og_title,
+      og_description,
+      og_image_url,
+      favicon_url,
+    },
     controls: {
       maintenance_mode: rawControls?.maintenance_mode ?? defaultSettings.controls.maintenance_mode,
       pages: {
@@ -331,4 +356,4 @@ export async function getPublicSettings() {
       },
     },
   } satisfies PublicSettings;
-}
+});

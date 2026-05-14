@@ -1,7 +1,7 @@
 import SiteFooter from '@/components/SiteFooter';
 import SiteHeader from '@/components/SiteHeader';
 import MaintenanceMode from '@/components/MaintenanceMode';
-import ElfsightReviews from '@/components/ElfsightReviews';
+import ElfsightReviewsLazy from '@/components/ElfsightReviewsLazy';
 import PageIntro from '@/components/public/PageIntro';
 import { PageSection } from '@/components/public/PageSection';
 import RevealOnScroll from '@/components/animations/RevealOnScroll';
@@ -28,7 +28,7 @@ export default async function ReviewsPage() {
         <RevealOnScroll className="mx-auto mt-12 w-full max-w-5xl" delay={0.06}>
           {elfsightAppId ? (
             <div className={cn(cardSurface, 'p-6 md:p-10')}>
-              <ElfsightReviews appId={elfsightAppId} />
+              <ElfsightReviewsLazy appId={elfsightAppId} />
             </div>
           ) : (
             <div className={cn(cardSurface, 'p-8 text-center md:p-12')}>

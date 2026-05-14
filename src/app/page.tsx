@@ -18,7 +18,7 @@ import ProjectCoverImage from '@/components/ProjectCoverImage';
 import ServiceCardIcon from '@/components/ServiceCardIcon';
 import StaggerOnMount from '@/components/animations/StaggerOnMount';
 import RevealOnScroll from '@/components/animations/RevealOnScroll';
-import ElfsightReviews from '@/components/ElfsightReviews';
+import ElfsightReviewsLazy from '@/components/ElfsightReviewsLazy';
 import { getPublicContent, getPublicSettings } from '@/lib/content';
 import { getElfsightGoogleReviewsAppId } from '@/lib/elfsight';
 import { PageSection } from '@/components/public/PageSection';
@@ -60,11 +60,11 @@ export default async function HomePage() {
                 <p data-reveal className={cn(bodyMuted, 'mt-6 max-w-xl text-lg md:text-xl')}>
                   {content.hero.description}
                 </p>
-                <div data-reveal className="mt-8 flex flex-wrap gap-3">
-                  <Link href="/contact" className={btnPrimary}>
+                <div data-reveal className="mt-8 flex min-h-[44px] flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <Link href="/contact" className={cn(btnPrimary, 'w-full justify-center sm:w-auto')}>
                     {content.hero.primaryCta}
                   </Link>
-                  <Link href="/projects" className={btnSecondary}>
+                  <Link href="/projects" className={cn(btnSecondary, 'w-full justify-center sm:w-auto')}>
                     {content.hero.secondaryCta}
                   </Link>
                 </div>
@@ -85,7 +85,16 @@ export default async function HomePage() {
                 />
                 <div className="relative space-y-6">
                   <div className="mx-auto flex max-w-sm flex-col gap-4">
-                    <div className="aspect-[4/5] w-full rounded-2xl bg-gradient-to-br from-[#0D1B2A] via-[#162a40] to-[#0D1B2A] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/10" />
+                    {content.hero.image_url ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={content.hero.image_url}
+                        alt="Hero"
+                        className="aspect-[4/5] w-full rounded-2xl object-cover shadow-[0_4px_32px_-8px_rgba(13,27,42,0.45)] ring-1 ring-white/10"
+                      />
+                    ) : (
+                      <div className="aspect-[4/5] w-full rounded-2xl bg-gradient-to-br from-[#0D1B2A] via-[#162a40] to-[#0D1B2A] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/10" />
+                    )}
                     <div className="flex items-center gap-3 rounded-2xl bg-white/85 px-4 py-3 ring-1 ring-[#0D1B2A]/[0.06] backdrop-blur-md">
                       <BadgeCheck className="h-5 w-5 shrink-0 text-[#B8941F]" />
                       <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#555555]">
@@ -144,13 +153,20 @@ export default async function HomePage() {
           <div className="mt-12 grid gap-6 md:grid-cols-2">
             {content.services.items.map((service, i) => (
               <RevealOnScroll key={service.id || service.title} delay={Math.min(i * 0.07, 0.35)}>
-                <article className={cn(cardSurface, 'group h-full p-7 transition duration-300 hover:-translate-y-1')}>
-                  <ServiceCardIcon imageUrl={service.image_url} title={service.title} />
-                  <h3 className="mt-6 text-2xl font-semibold tracking-tight">{service.title}</h3>
-                  <p className={cn(bodyMuted, 'mt-3 text-[17px]')}>{service.text}</p>
-                  <Link href="/contact" className={cn(linkAccent, 'mt-7')}>
-                    Ask about this service <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
+                <article className={cn(cardSurface, 'group h-full overflow-hidden transition duration-300 hover:-translate-y-1')}>
+                  <ServiceCardIcon
+                    imageUrl={service.image_url}
+                    title={service.title}
+                    variant="cover"
+                    className="h-48 rounded-t-[1.25rem]"
+                  />
+                  <div className="p-7">
+                    <h3 className="text-2xl font-semibold tracking-tight">{service.title}</h3>
+                    <p className={cn(bodyMuted, 'mt-3 text-[17px]')}>{service.text}</p>
+                    <Link href="/contact" className={cn(linkAccent, 'mt-7')}>
+                      Ask about this service <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </div>
                 </article>
               </RevealOnScroll>
             ))}
@@ -197,7 +213,7 @@ export default async function HomePage() {
           <RevealOnScroll className="mt-10" delay={0.06}>
             {elfsightAppId ? (
               <div className={cn(cardSurface, 'p-6 md:p-8')}>
-                <ElfsightReviews appId={elfsightAppId} />
+                <ElfsightReviewsLazy appId={elfsightAppId} />
               </div>
             ) : (
               <div className={cn(cardSurface, 'flex flex-col gap-4 p-7 md:flex-row md:items-center md:justify-between md:p-8')}>
